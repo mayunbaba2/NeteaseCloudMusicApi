@@ -1,8 +1,4 @@
-const express = require('express')
-const router = express()
-const request = require('request')
-const { createWebAPIRequest } = require('../util/util')
-router.get('/', (req, res) => {
+module.exports = (req, res, createWebAPIRequest, request) => {
   const id = parseInt(req.query.id)
   const br = parseInt(req.query.br || 999000)
   const data = {
@@ -19,8 +15,11 @@ router.get('/', (req, res) => {
     data,
     cookie,
     music_req => {
-      if (JSON.parse(music_req).code == 200) {
-        return res.send({ success: true, message: 'ok' })
+      music_req = JSON.parse(music_req)
+      if (music_req.code == 200) {
+        if (music_req.data[0].code == 200){
+          return res.send({ success: true, message: 'ok' })
+        }
       }
       return res.send({ success: false, message: '亲爱的,暂无版权' })
     },
@@ -28,6 +27,4 @@ router.get('/', (req, res) => {
       res.status(502).send('fetch error')
     }
   )
-})
-
-module.exports = router
+}
